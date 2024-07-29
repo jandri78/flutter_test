@@ -39,6 +39,7 @@ dependencies:
   booking_calendar: ^1.1.10
   calendar_view: ^1.2.0
   syncfusion_flutter_calendar: ^26.2.5
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
