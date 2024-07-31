@@ -1,25 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/scrreens/home_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-class CalendarViewScreen extends StatefulWidget {
-  static const String routeName = '/calendarView';
+import '../../provider/formProvider.dart';
+import '../Formulario.dart';
+import '../form_calendar_screen.dart';
 
-  const CalendarViewScreen({super.key});
+class CalendarFusionScreen extends StatefulWidget {
+  static const String routeName = '/calendarFusion';
+
+  const CalendarFusionScreen({super.key});
 
   @override
-  State<CalendarViewScreen> createState() => _CalendarViewState();
+  State<CalendarFusionScreen> createState() => _CalendarViewState();
 }
 
-class _CalendarViewState extends State<CalendarViewScreen> {
-  final List<Meeting> meetings = <Meeting>[];
+class _CalendarViewState extends State<CalendarFusionScreen> {
+  final List<Meeting> meetings = <Meeting>[
+    Meeting(
+        'test',
+        DateTime.now(),
+        DateTime.now().add(const Duration(hours: 2)),
+        const Color.fromARGB(255, 37, 15, 201),
+        false)
+  ];
 
   @override
   Widget build(BuildContext context) {
+    FormProvider formProvider = Provider.of<FormProvider>(context);
+
+    String eventTitle = 'T-4 Apt-403';
     DateTime? fecha;
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Calendar View'),
+          title: Text('Gimnasio'),
         ),
         body: SfCalendar(
           onLongPress: (calendarLongPressDetails) => {
@@ -30,7 +45,8 @@ class _CalendarViewState extends State<CalendarViewScreen> {
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
                     title: const Text('AlertDialog Title'),
-                    content: FormExample(fecha!),
+                    //content: FormExample(fecha!),
+                    content: TimePickerDemo(fecha),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () =>
@@ -40,7 +56,8 @@ class _CalendarViewState extends State<CalendarViewScreen> {
                       TextButton(
                         onPressed: () => {
                           Navigator.pop(context, HomeScreen.routeName),
-                          addMeeting(fecha),
+                          addMeeting(formProvider.startTime,
+                              formProvider.endTime, eventTitle),
                           setState(() {}),
                         },
                         child: const Text('OK'),
@@ -50,7 +67,12 @@ class _CalendarViewState extends State<CalendarViewScreen> {
                 ),
               }
           },
-          view: CalendarView.month,
+          allowedViews: const [
+            CalendarView.week,
+            CalendarView.day,
+            CalendarView.month
+          ],
+          view: CalendarView.week,
           dataSource: MeetingDataSource(meetings),
           monthViewSettings: const MonthViewSettings(
             showAgenda: true,
@@ -58,13 +80,10 @@ class _CalendarViewState extends State<CalendarViewScreen> {
         ));
   }
 
-  void addMeeting(DateTime? fecha) {
-    return meetings.add(Meeting(
-        'Conference 2',
-        fecha!,
-        fecha.add(const Duration(hours: 2)),
-        const Color.fromARGB(255, 37, 15, 201),
-        false));
+  void addMeeting(DateTime? startDate, DateTime? endDate, String eventName) {
+    print('addMeeting $startDate startDate');
+    return meetings.add(Meeting(eventName, startDate!, endDate!,
+        const Color.fromARGB(255, 37, 15, 201), false));
   }
 
   // ignore: unused_element
@@ -144,24 +163,4 @@ class Meeting {
 
   /// IsAllDay which is equivalent to isAllDay property of [Appointment].
   bool isAllDay;
-}
-
-class FormExample extends StatelessWidget {
-  DateTime fecha;
-
-  FormExample(this.fecha, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-        child: Column(children: [
-      TextFormField(
-        decoration: const InputDecoration(
-          icon: Icon(Icons.person),
-          hintText: 'What do people call you?',
-          labelText: 'Name *',
-        ),
-      ),
-    ]));
-  }
 }
